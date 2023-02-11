@@ -112,7 +112,13 @@ class LoginViewController: UIViewController {
         return label
     }()
     
-    
+    private let showPasswordButton : UIButton = {
+        
+        let button = UIButton(type: .custom)
+        button.setImage(UIImage(systemName: "eye.slash"), for: .normal)
+        button.imageEdgeInsets = UIEdgeInsets(top: 0, left: -16, bottom: 0, right: 0)
+        return button
+    }()
     
     
     //MARK: viewDidLoad()
@@ -130,6 +136,9 @@ class LoginViewController: UIViewController {
         passwordField.delegate = self
         
         
+        passwordField.rightView = showPasswordButton
+        passwordField.rightViewMode = .always
+        
         self.view.addSubview(scrollView)
         scrollView.addSubview(imageView)
         scrollView.addSubview(emailField)
@@ -139,6 +148,8 @@ class LoginViewController: UIViewController {
         scrollView.addSubview(passwordRule)
         scrollView.addSubview(passwordError)
         scrollView.addSubview(loginButton)
+        scrollView.addSubview(showPasswordButton)
+
 
 
     }
@@ -228,7 +239,7 @@ extension LoginViewController {
         passwordField.addTarget(self, action: #selector(passwordFieldDidChange), for: .allEditingEvents)
         loginButton.addTarget(self, action: #selector(loginTapped), for: .touchUpInside)
 
-        
+        showPasswordButton.addTarget(self, action: #selector(showPassword), for: .touchUpInside)
     }
     
     @objc func  emailFieldDidChange() {
@@ -264,26 +275,30 @@ extension LoginViewController {
 
         guard let email = emailField.text , let password = passwordField.text ,
               !email.isEmpty , !password.isEmpty else {
-            print("can not login ")
+            showAlert()
             return
         }
         
       print("tapped")
     }
+
     
-//    func isLoginEnabled(){
-//
-//        guard let email = emailField.text , let password = passwordField.text ,
-//              email.isEmailFormatted , password.isEmailFormatted else {
-//            loginButton.isEnabled = false
-//            loginButton.backgroundColor = .gray
-//            return
-//        }
-//        if !email.isEmpty {
-//           loginButton.isEnabled = true
-//           loginButton.backgroundColor = .link
-//        }
-//
-//
-//    }
+    func showAlert(){
+        let alert = UIAlertController(title: StringManager.oops, message: StringManager.registerError , preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: StringManager.okAlertAction, style: .cancel))
+        present(alert , animated:  false)
+    }
+            
+   @objc func showPassword(){
+      if ( passwordField.isSecureTextEntry ){
+          showPasswordButton.setImage(UIImage(systemName: "eye"), for: .normal)
+          passwordField.isSecureTextEntry = false
+      }else{
+          showPasswordButton.setImage(UIImage(systemName: "eye.slash"), for: .normal)
+          passwordField.isSecureTextEntry = true
+      }
+       
+       
+    }
 }
